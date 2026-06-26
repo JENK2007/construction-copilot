@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db import create_tables
+from app.routers import cost, orchestrator
 
 app = FastAPI(title="Construction Copilot API")
 
@@ -19,3 +20,7 @@ def startup():
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "construction-copilot-api"}
+
+# Routers
+app.include_router(cost.router, prefix="/api/cost", tags=["Cost Estimation"])
+app.include_router(orchestrator.router, prefix="/api/orchestrator", tags=["Orchestrator"])

@@ -1,5 +1,9 @@
 from openai import OpenAI
 from app.core.config import settings
+from app.agents.cost_agent import run_cost_agent
+from app.agents.knowledge_agent import run_knowledge_agent
+from app.agents.material_agent import run_material_agent
+from app.agents.risk_agent import run_risk_agent
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
@@ -59,4 +63,46 @@ async def route_query(query: str) -> dict:
         "agent": agent,
         "routing_method": method,
         "query": query
+    }
+
+async def run_orchestrator(query: str) -> dict:
+    """Route query to the correct agent and return response."""
+    
+    # Step 1: Detect intent using existing routing logic
+    routing = await route_query(query)
+    agent = routing["agent"]
+    method = routing["routing_method"]
+
+    # Step 2: Route to correct agent
+    if agent == "cost":
+        result = await run_cost_agent(query)
+        result["intent"] = "cost"
+        result["routed_to"] = "Cost Estimation Agent"
+        result["routing_method"] = method
+        return result
+
+    if agent == "knowledge":
+        result = await run_knowledge_agent(query)
+        result["intent"] = "knowledge"
+        result["routed_to"] = "Construction Knowledge Agent"
+        result["routing_method"] = method
+        return result
+
+        if agent == "risk":
+        result = await run_risk_agent(query)
+        result["intent"] = "risk"
+        result["routed_to"] = "Risk Analysis Agent"
+        result["routing_method"] = method
+        return result
+
+    # Placeholder for remaining agents
+    return {
+        "agent": "Orchestrator",
+        "intent": agent,
+        "routed_to": f"{agent.capitalize()} Agent (coming soon)",
+        "routing_method": method,
+        "answer": f"This is a {agent} question. This agent is coming soon.",
+        "source_rows": [],
+        "keywords_used": [],
+        "average_bid_in_results": None,
     }
