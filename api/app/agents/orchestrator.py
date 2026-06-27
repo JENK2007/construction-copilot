@@ -66,14 +66,10 @@ async def route_query(query: str) -> dict:
     }
 
 async def run_orchestrator(query: str) -> dict:
-    """Route query to the correct agent and return response."""
-    
-    # Step 1: Detect intent using existing routing logic
     routing = await route_query(query)
     agent = routing["agent"]
     method = routing["routing_method"]
 
-    # Step 2: Route to correct agent
     if agent == "cost":
         result = await run_cost_agent(query)
         result["intent"] = "cost"
@@ -88,14 +84,20 @@ async def run_orchestrator(query: str) -> dict:
         result["routing_method"] = method
         return result
 
-        if agent == "risk":
+    if agent == "risk":
         result = await run_risk_agent(query)
         result["intent"] = "risk"
         result["routed_to"] = "Risk Analysis Agent"
         result["routing_method"] = method
         return result
 
-    # Placeholder for remaining agents
+    if agent == "material":
+        result = await run_material_agent(query)
+        result["intent"] = "material"
+        result["routed_to"] = "Material Recommendation Agent"
+        result["routing_method"] = method
+        return result
+
     return {
         "agent": "Orchestrator",
         "intent": agent,
