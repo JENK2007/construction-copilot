@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import create_tables
 from app.routers.chat import router as chat_router
 from app.mcp.postgres_mcp import router as mcp_router
+from app.routers.pdf import router as pdf_router
 
 app = FastAPI(title="Construction Copilot API")
 
@@ -24,3 +25,4 @@ def health():
 
 app.include_router(chat_router, prefix="/api")
 app.include_router(mcp_router, prefix="/api")
+app.include_router(pdf_router, prefix="/api")
