@@ -20,9 +20,18 @@ def startup():
     create_tables()
 
 @app.get("/health")
+@app.get("/api/health")
 def health():
     return {"status": "ok", "service": "construction-copilot-api"}
 
 app.include_router(chat_router, prefix="/api")
+app.include_router(chat_router)
 app.include_router(mcp_router, prefix="/api")
+app.include_router(mcp_router)
 app.include_router(pdf_router, prefix="/api")
+app.include_router(pdf_router)
+
+@app.api_route("/{path_name:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def catch_all(path_name: str):
+    # Fallback to see if we're hitting unhandled paths
+    return {"error": "Not Found", "path_received": path_name}
